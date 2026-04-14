@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking History - Daily Connect</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .history-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+
+        .history-card:hover {
+            box-shadow: var(--hover-shadow);
+            border-color: rgba(79,70,229,0.3);
+            transform: translateY(-2px);
+        }
+
+        .history-info {
+            flex: 1;
+        }
+
+        .history-status {
+            text-align: right;
+            min-width: 150px;
+        }
+
+        .history-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .history-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            .history-status {
+                text-align: left;
+            }
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 3rem;
+        }
+
+        .page-btn {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .page-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .page-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .page-btn:disabled {
+            background: #f1f5f9;
+            color: #94a3b8;
+            cursor: not-allowed;
+            border-color: var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Daily Connect
+        </a>
+        <div class="nav-links">
+            <a href="user-dashboard.html">Dashboard</a>
+            <a href="workers.html">Browse Workers</a>
+            <a href="user-profile.html">My Profile</a>
+            <a href="#" id="logoutBtn" class="btn btn-outline">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <div>
+                <h2>Booking History</h2>
+                <p class="text-secondary">View and manage all your past and current booking requests.</p>
+            </div>
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <div class="history-list" id="historyContainer">
+            <div class="loader"></div>
+        </div>
+
+        <div class="pagination" id="historyPagination">
+            <!-- Pagination will be inserted here -->
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <div class="modal-content" style="background:#fff; padding:20px; border-radius:8px; width:90%; max-width:400px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <h3 style="margin-top:0;">Rate Worker</h3>
+            <div id="reviewAlert" class="alert"></div>
+            <form id="reviewForm">
+                <input type="hidden" id="reviewJobId">
+                <input type="hidden" id="reviewWorkerId">
+                <div class="form-group">
+                    <label>Rating (1-5)</label>
+                    <input type="number" id="reviewRating" class="form-control" min="1" max="5" required placeholder="5">
+                </div>
+                <div class="form-group">
+                    <label>Review Comment (optional)</label>
+                    <textarea id="reviewText" class="form-control" rows="3" placeholder="Tell us about your experience..."></textarea>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button type="submit" class="btn btn-primary" style="flex:1;">Submit Review</button>
+                    <button type="button" class="btn btn-outline" style="flex:1;" onclick="document.getElementById('reviewModal').style.display='none'">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="user-dashboard.html">Dashboard</a>
+            </div>
+            <p class="text-secondary">&copy; 2024 Daily Connect. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/user.js"></script>
+</body>
+</html>

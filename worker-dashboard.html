@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Dashboard - Daily Connect</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Daily Connect
+        </a>
+        <div class="nav-links">
+            <a href="worker-profile.html">Edit Profile</a>
+            <a href="#" id="logoutBtn" class="btn btn-outline">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-header" style="flex-wrap: wrap; align-items:flex-start;">
+            <div>
+                <h2 id="welcomeMsg" style="margin-bottom:5px;">Welcome, Worker</h2>
+                <div id="workerStats" style="margin-bottom:15px; font-size:14px; min-height: 24px;">
+                    <!-- Badges and rating populated here -->
+                </div>
+            </div>
+            <a href="worker-profile.html" class="btn btn-primary">Update Profile</a>
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <h3>Assigned Jobs</h3>
+        <div class="grid-cards" id="jobsContainer">
+            <!-- Jobs will be populated here by JS -->
+            <p>Loading your job requests...</p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="workers.html">Browse Workers</a>
+                <a href="login.html">Login</a>
+                <a href="register.html">Register</a>
+            </div>
+            <p class="text-secondary">&copy; 2024 Daily Connect. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/worker.js"></script>
+</body>
+</html>

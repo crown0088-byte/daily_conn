@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - Daily Connect</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="worker-dashboard.html" class="navbar-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Daily Connect
+        </a>
+        <div class="nav-links">
+            <a href="worker-dashboard.html">Dashboard</a>
+            <a href="#" id="logoutBtn" class="btn btn-outline">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container auth-wrapper">
+        <div class="auth-card" style="max-width: 600px;">
+            <h2>Edit Worker Profile</h2>
+            <div id="profileAlert" class="alert"></div>
+            
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="skills">Skills (comma separated)</label>
+                    <input type="text" id="skills" class="form-control" required placeholder="e.g. Plumber, Electrician">
+                </div>
+                <div class="form-group">
+                    <label for="pricing">Pricing (Daily Rate - USD)</label>
+                    <input type="number" step="0.01" id="pricing" class="form-control" required placeholder="e.g. 50.00">
+                </div>
+                <div class="form-group">
+                    <label for="location">Location / City</label>
+                    <input type="text" id="location" class="form-control" required placeholder="e.g. New York">
+                </div>
+                <div class="form-group">
+                    <label for="availability">Availability</label>
+                    <select id="availability" class="form-control" required>
+                        <option value="available">Available</option>
+                        <option value="busy">Busy</option>
+                        <option value="offline">Offline</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Profile</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="workers.html">Browse Workers</a>
+                <a href="login.html">Login</a>
+                <a href="register.html">Register</a>
+            </div>
+            <p class="text-secondary">&copy; 2024 Daily Connect. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/worker.js"></script>
+</body>
+</html>

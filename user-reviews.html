@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Reviews - Daily Connect</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .review-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .review-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+
+        .review-card:hover {
+            box-shadow: var(--hover-shadow);
+            border-color: rgba(79,70,229,0.3);
+            transform: translateY(-2px);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .worker-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .worker-name:hover {
+            color: var(--primary-color);
+        }
+
+        .review-job {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .stars {
+            color: #f39c12;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+
+        .review-body {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            font-style: italic;
+            color: var(--text-primary);
+            margin-top: 1rem;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .review-date {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+            text-align: right;
+        }
+
+        @media (max-width: 768px) {
+            .review-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Daily Connect
+        </a>
+        <div class="nav-links">
+            <a href="user-dashboard.html">Dashboard</a>
+            <a href="workers.html">Browse Workers</a>
+            <a href="user-profile.html">My Profile</a>
+            <a href="user-history.html">History</a>
+            <a href="#" id="logoutBtn" class="btn btn-outline">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <div>
+                <h2>My Reviews</h2>
+                <p class="text-secondary">A complete history of feedback you've left for workers.</p>
+            </div>
+        </div>
+
+        <div class="review-list" id="reviewsContainer">
+            <div class="loader"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="user-dashboard.html">Dashboard</a>
+            </div>
+            <p class="text-secondary">&copy; 2024 Daily Connect. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/user.js"></script>
+</body>
+</html>

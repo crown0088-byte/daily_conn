@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Job - Daily Connect</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Custom Booking UI Styles */
+        .booking-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--surface-color);
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 0.75rem;
+            text-align: center;
+            border: none;
+            background: transparent;
+            border-radius: calc(var(--border-radius) - 4px);
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .tab-btn:hover { color: var(--primary-color); }
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .price-box {
+            background: linear-gradient(135deg, rgba(79,70,229,0.05), rgba(124,58,237,0.1));
+            border: 2px solid rgba(79,70,229,0.2);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+        .price-display {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin: 0.5rem 0;
+            letter-spacing: -1px;
+        }
+        
+        .emergency-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #DC2626;
+            font-weight: 600;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #FEF2F2;
+            border-radius: var(--border-radius);
+            border: 2px dashed #FCA5A5;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .emergency-toggle:hover { background: #FEE2E2; border-color:#EF4444; }
+        
+        .worker-status {
+            display: inline-block;
+            width: 12px; height: 12px;
+            background: #10B981;
+            border-radius: 50%;
+            margin-right: 5px;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+        }
+        .worker-status.offline {
+            background: #DC2626;
+            box-shadow: 0 0 8px rgba(220, 38, 38, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="user-dashboard.html" class="navbar-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Daily Connect
+        </a>
+        <div class="nav-links">
+            <a href="workers.html">Back to Workers</a>
+        </div>
+    </nav>
+
+    <div class="container auth-wrapper" style="margin-top: 2rem; margin-bottom: 4rem;">
+        <div class="auth-card" style="max-width: 650px; padding: 2.5rem;">
+            <h2 style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">Complete Booking</h2>
+            
+            <div id="requestAlert" class="alert"></div>
+            
+            <form id="advancedJobRequestForm">
+                <input type="hidden" id="workerId">
+                <input type="hidden" id="baseRate" value="0">
+                <input type="hidden" id="currentBookingType" value="service">
+
+                <!-- Worker Profile Over-view -->
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 2rem; background: var(--surface-color); padding: 1rem; border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                    <div>
+                        <h3 id="workerNameDisplay" style="margin-bottom:0.25rem; font-size:1.5rem;">Loading Worker...</h3>
+                        <div style="font-size: 1rem; color:var(--text-secondary); display:flex; align-items:center;">
+                            <span class="worker-status" id="workerStatusIndicator"></span>
+                            <span id="workerStatusText">Online & Available</span>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-weight:bold; color:var(--primary-color); font-size:1.2rem;">$<span id="workerRateDisplay">0</span><span style="font-size:0.9rem; color:var(--text-secondary);">/day</span></div>
+                        <div style="font-size:0.85rem; color:var(--text-secondary);">Standard Rate</div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <h4 style="margin-bottom: 0.8rem; color:var(--text-primary);">1. Select Booking Type</h4>
+                <div class="booking-tabs" id="bookingTabs">
+                    <button type="button" class="tab-btn active" data-target="tab-service" data-type="service">Fixed Service</button>
+                    <button type="button" class="tab-btn" data-target="tab-hourly" data-type="hourly">Hourly Rate</button>
+                    <button type="button" class="tab-btn" data-target="tab-daily" data-type="daily">Full Day</button>
+                </div>
+
+                <!-- Specific Tab Contents -->
+                <div id="tab-service" class="tab-content active" style="margin-bottom:2rem; padding:1rem; border:1px solid var(--border-color); border-radius:var(--border-radius);">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Select Service Scope</label>
+                        <select id="serviceOption" class="form-control">
+                            <option value="0.5">Standard Task / Quick Fix (50% Day Rate)</option>
+                            <option value="0.8">Deep Work / Overhaul (80% Day Rate)</option>
+                            <option value="0.3">Consultation & Inspection (30% Day Rate)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="tab-hourly" class="tab-content" style="margin-bottom:2rem; padding:1rem; border:1px solid var(--border-color); border-radius:var(--border-radius);">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Estimated Hours Needed</label>
+                        <div style="display:flex; align-items:center; gap:1rem;">
+                            <input type="range" id="hourlyCountRange" min="1" max="12" value="2" style="flex:1;">
+                            <input type="number" id="hourlyCountInput" class="form-control" min="1" max="12" value="2" style="width:80px; text-align:center;">
+                        </div>
+                        <small class="text-secondary mt-1">Calculated at (Daily Rate / 8) per hour.</small>
+                    </div>
+                </div>
+
+                <div id="tab-daily" class="tab-content" style="margin-bottom:2rem; padding:1.5rem; border:1px solid var(--border-color); border-radius:var(--border-radius); background:var(--surface-color); text-align:center;">
+                    <div style="font-size:2.5rem;">📅</div>
+                    <h4 class="mt-1">Full 8-Hour Day Booked</h4>
+                    <p class="text-secondary mt-1">Worker is explicitly reserved for you for an entire standard shift at their base rate.</p>
+                </div>
+
+                <!-- Common Fields -->
+                <h4 style="margin-bottom: 0.8rem; color:var(--text-primary); margin-top:2rem;">2. Job Details</h4>
+                <div class="form-group">
+                    <label>Service Date & Time Slot</label>
+                    <div style="display:flex; gap:1rem;">
+                        <input type="date" id="serviceDate" class="form-control" required style="flex:1;">
+                        <input type="time" id="serviceTime" class="form-control" required style="flex:1;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Service Location / Address</label>
+                    <input type="text" id="serviceLocation" class="form-control" required placeholder="e.g. 123 Main St, Appt 4B">
+                </div>
+
+                <div class="form-group">
+                    <label>Job Description</label>
+                    <textarea id="description" class="form-control" rows="3" required placeholder="Provide any special instructions or details about the work required..."></textarea>
+                </div>
+
+                <!-- Emergency Booking Toggle -->
+                <label class="emergency-toggle">
+                    <input type="checkbox" id="emergencyToggle" style="width: 20px; height: 20px; accent-color: #DC2626; cursor:pointer;"> 
+                    <span style="flex:1;">🚨 Emergency / Urgent Booking<br><small style="font-weight:normal; color:#991B1B;">Worker guarantees arrival within 2 hours.</small></span>
+                    <strong style="font-size:1.1rem;">+$20.00</strong>
+                </label>
+
+                <!-- Payment Selection -->
+                <div class="form-group" style="margin-top:2rem;">
+                    <label>Payment Method</label>
+                    <select id="paymentMethod" class="form-control">
+                        <option value="cash">💵 Cash / Direct payment on Completion</option>
+                        <option value="upi">📱 UPI / Mobile Transfer</option>
+                    </select>
+                </div>
+
+                <!-- Dynamic Price Box -->
+                <div class="price-box">
+                    <div style="font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-secondary);">Total Estimated Price</div>
+                    <div class="price-display">$<span id="calculatedPrice">0.00</span></div>
+                    <small class="text-secondary" style="font-weight:500;">*Final price is subject to adjustment during worker negotiation</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width:100%; font-size:1.25rem; padding:1.2rem; margin-top:1rem; border-radius:var(--border-radius-lg); box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);">
+                    Confirm & Send Booking
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="workers.html">Browse Workers</a>
+            </div>
+            <p class="text-secondary">&copy; 2024 Daily Connect. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const API_URL = window.API_URL;
+            // URL Params
+            const params = new URLSearchParams(window.location.search);
+            const workerId = params.get('worker');
+            const name = params.get('name');
+            const rate = parseFloat(params.get('rate')) || 0;
+
+            if(!workerId) {
+                window.location.href = 'workers.html';
+                return;
+            }
+
+            // Bind worker info
+            document.getElementById('workerId').value = workerId;
+            document.getElementById('workerNameDisplay').innerText = name || 'Unknown Worker';
+            document.getElementById('workerRateDisplay').innerText = rate;
+            document.getElementById('baseRate').value = rate;
+
+            // Set default date to today
+            document.getElementById('serviceDate').valueAsDate = new Date();
+
+            // Element Refs
+            const tabs = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.tab-content');
+            const typeInput = document.getElementById('currentBookingType');
+            const serviceOpt = document.getElementById('serviceOption');
+            const hourRange = document.getElementById('hourlyCountRange');
+            const hourInput = document.getElementById('hourlyCountInput');
+            const emergencyTog = document.getElementById('emergencyToggle');
+            const priceDisp = document.getElementById('calculatedPrice');
+
+            // Synchronize range and number input for hours
+            hourRange.addEventListener('input', (e) => { hourInput.value = e.target.value; calculatePrice(); });
+            hourInput.addEventListener('input', (e) => { hourRange.value = e.target.value; calculatePrice(); });
+
+            // Triggers for price calculation
+            serviceOpt.addEventListener('change', calculatePrice);
+            emergencyTog.addEventListener('change', calculatePrice);
+
+            // Tab Switching Logic
+            tabs.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active from all
+                    tabs.forEach(t => t.classList.remove('active'));
+                    contents.forEach(c => c.classList.remove('active'));
+
+                    // Set active to clicked
+                    btn.classList.add('active');
+                    const targetId = btn.getAttribute('data-target');
+                    document.getElementById(targetId).classList.add('active');
+                    
+                    // Update state
+                    typeInput.value = btn.getAttribute('data-type');
+                    calculatePrice();
+                });
+            });
+
+            // Master Calculation Function
+            function calculatePrice() {
+                const base = parseFloat(document.getElementById('baseRate').value);
+                const type = typeInput.value;
+                const isEmergency = emergencyTog.checked;
+                let final = 0;
+
+                if(type === 'service') {
+                    const mult = parseFloat(serviceOpt.value);
+                    final = base * mult;
+                } else if(type === 'hourly') {
+                    const hrs = parseInt(hourInput.value) || 1;
+                    const hourlyRate = base / 8; // Assumed 8 hour workday
+                    final = hourlyRate * hrs;
+                } else if(type === 'daily') {
+                    final = base;
+                }
+
+                if(isEmergency) {
+                    final += 20; // Extra flat surcharge
+                }
+
+                // Animate change
+                priceDisp.style.opacity = '0.5';
+                setTimeout(() => {
+                    priceDisp.innerText = final.toFixed(2);
+                    priceDisp.style.opacity = '1';
+                }, 150);
+            }
+
+            // Initial calc
+            calculatePrice();
+
+            // Handle Submission (Replacing user.js logic to handle ALL new fields)
+            document.getElementById('advancedJobRequestForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const user = JSON.parse(localStorage.getItem('daily_connect_user'));
+                if(!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const payload = {
+                    user_id: user.id,
+                    worker_id: workerId,
+                    booking_type: typeInput.value,
+                    service_date: document.getElementById('serviceDate').value,
+                    service_time: document.getElementById('serviceTime').value,
+                    location: document.getElementById('serviceLocation').value,
+                    description: document.getElementById('description').value,
+                    is_emergency: emergencyTog.checked,
+                    payment_method: document.getElementById('paymentMethod').value,
+                    total_estimated_price: priceDisp.innerText
+                };
+
+                // NOTE: Because our current backend (user/send_request.php) might only accept basic fields right now,
+                // we send the complex payload, but for fallback we also enrich the basic 'description' field so the backend captures it!
+                payload.description = `[${payload.booking_type.toUpperCase()} BOOKING | ${payload.service_date} @ ${payload.service_time}] Location: ${payload.location} | Details: ${payload.description} | Pmt: ${payload.payment_method}`;
+
+                try {
+                    const response = await fetch(`${API_URL}/user/send_request.php`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await response.json();
+                    
+                    if(data.status === 'success') {
+                        const alertBox = document.getElementById('requestAlert');
+                        alertBox.className = 'alert alert-success';
+                        alertBox.style.display = 'block';
+                        alertBox.innerText = 'Booking Request Sent Successfully!';
+                        setTimeout(() => window.location.href = 'user-dashboard.html', 1500);
+                    } else {
+                        const alertBox = document.getElementById('requestAlert');
+                        alertBox.className = 'alert alert-error';
+                        alertBox.style.display = 'block';
+                        alertBox.innerText = data.message;
+                    }
+                } catch (err) {
+                    const alertBox = document.getElementById('requestAlert');
+                    alertBox.className = 'alert alert-error';
+                    alertBox.style.display = 'block';
+                    alertBox.innerText = 'Failed to send request.';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

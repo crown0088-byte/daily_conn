@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Daily Connect</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Animations */
+        .animate {
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .fade-in { transform: translateY(30px); }
+        .slide-in-left { transform: translateX(-50px); }
+        .slide-in-right { transform: translateX(50px); }
+        .slide-in-bottom { transform: translateY(50px); }
+        .visible { opacity: 1; transform: translate(0) scale(1); }
+
+        /* Split Layout */
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            margin: 6rem auto;
+        }
+        .split-layout img {
+            width: 100%;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--card-shadow);
+            object-fit: cover;
+        }
+        @media (max-width: 768px) {
+            .split-layout { grid-template-columns: 1fr; gap: 2rem; }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 4rem auto;
+        }
+        .stat-card {
+            text-align: center;
+            padding: 2.5rem;
+            background: var(--surface-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        .stat-card:hover { transform: translateY(-8px); box-shadow: var(--hover-shadow); border-color: rgba(79,70,229,0.3); }
+        .stat-card .icon { font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary-color); }
+        .stat-card h3 { font-size: 2.5rem; color: var(--text-primary); margin-bottom: 0.5rem; }
+        .stat-card p { font-size: 1.1rem; color: var(--text-secondary); font-weight: 500; }
+
+        /* Mission Vision */
+        .mission-grid, .offer-grid {
+            display: grid;
+            gap: 2rem;
+            margin: 4rem auto;
+        }
+        .mission-grid { grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); }
+        
+        /* Ensure 4 boxes don't orphan the 4th item */
+        .offer-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 2rem;
+            margin: 4rem auto;
+        }
+        @media (min-width: 650px) {
+            .offer-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 1050px) {
+            .offer-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .icon-card {
+            padding: 2.5rem;
+            background: var(--surface-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            text-align: left;
+        }
+        .icon-card:hover { transform: translateY(-8px); box-shadow: var(--hover-shadow); }
+        .icon-card .icon { font-size: 2rem; color: var(--primary-color); margin-bottom: 1.5rem; background: rgba(79,70,229,0.1); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
+        .icon-card h3 { margin-bottom: 1rem; }
+
+        /* CTA Bottom */
+        .cta-bottom {
+            background: var(--primary-gradient);
+            padding: 5rem 2rem;
+            border-radius: var(--border-radius-lg);
+            text-align: center;
+            color: white;
+            margin: 6rem auto 2rem auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--hover-shadow);
+        }
+        .cta-bottom h2 { color: white; display: block; font-size: 2.5rem; }
+        .cta-bottom p { color: rgba(255,255,255,0.9); margin-bottom: 2rem; font-size: 1.25rem; max-width: 600px; margin-left: auto; margin-right: auto;}
+        
+        /* Workforce Grid */
+        .workforce-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 3rem auto;
+        }
+        .worker-pic-card {
+            position: relative;
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+        .worker-pic-card:hover { transform: translateY(-8px); box-shadow: var(--hover-shadow); }
+        .worker-pic-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        .worker-pic-card:hover img { transform: scale(1.08); }
+        .worker-pic-card .label {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            padding: 2.5rem 1.5rem 1.2rem 1.5rem;
+            color: white;
+            font-size: 1.25rem;
+            font-weight: bold;
+            z-index: 2;
+        }
+        
+        /* Specific Button overrides for the Dark CTA background */
+        .cta-btn-primary {
+            background: white !important;
+            color: var(--primary-dark) !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+        }
+        .cta-btn-primary:hover {
+            transform: scale(1.05) translateY(-2px) !important;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+        }
+        .cta-btn-outline {
+            border: 2px solid white !important;
+            color: white !important;
+        }
+        .cta-btn-outline:hover {
+            background: white !important;
+            color: var(--primary-color) !important;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Daily Connect
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html">Home</a>
+            <a href="workers.html">Find Workers</a>
+            <a href="login.html" class="btn btn-outline" id="navLoginBtn">Login</a>
+            <a href="register.html" class="btn btn-primary" id="navRegBtn">Sign Up</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- 1. Hero Section -->
+        <div class="hero animate fade-in" style="padding-top: 8rem; padding-bottom: 8rem; margin-top:0;">
+            <h1>About Daily Connect</h1>
+            <p>Empowering communities by connecting skilled daily wage workers with the people who need them instantly.</p>
+            <div style="margin-top: 2.5rem; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <a href="workers.html" class="btn btn-primary">Explore Services</a>
+                <a href="register.html" class="btn btn-outline">Join Now</a>
+            </div>
+        </div>
+
+        <!-- 2. Who We Are -->
+        <section class="split-layout">
+            <div class="animate slide-in-left">
+                <h2 style="color: var(--primary-color); margin-bottom: 1.5rem;">Who We Are</h2>
+                <p style="font-size: 1.15rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                    Daily Connect is a modern marketplace designed to formalize the unorganized sector of daily wage labor. 
+                    We believe finding reliable help shouldn't rely on word-of-mouth or standing at labor chowks.
+                </p>
+                <p style="font-size: 1.15rem; color: var(--text-secondary);">
+                    Our platform brings skilled workers like plumbers, electricians, maids, and helpers directly to your fingertips, 
+                    creating fair pricing, transparency, and dignity for independent workers.
+                </p>
+            </div>
+            <div class="animate slide-in-right">
+                <div style="width: 100%; height: 350px; background: linear-gradient(135deg, rgba(79,70,229,0.1), rgba(124,58,237,0.2)); border-radius: var(--border-radius-lg); display: flex; align-items: center; justify-content: center; box-shadow: var(--card-shadow); border: 1px solid var(--border-color); overflow: hidden; position: relative;">
+                    <!-- Placeholder modern illustration/graphic representation -->
+                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.8;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <div style="position:absolute; bottom:-20px; right:-20px; width:200px; height:200px; background: var(--primary-color); opacity:0.1; border-radius:50%; filter: blur(30px);"></div>
+                    <div style="position:absolute; top:-20px; left:-20px; width:150px; height:150px; background: var(--secondary-color); opacity:0.1; border-radius:50%; filter: blur(30px);"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Platform Statistics -->
+        <section class="animate slide-in-bottom" style="margin-top: 8rem;">
+            <h2 class="text-center" style="margin-bottom: 0.5rem;">By The Numbers</h2>
+            <p class="text-center text-secondary" style="font-size: 1.1rem;">Growing every day to support local economies.</p>
+            <div class="stats-grid" id="statsSection">
+                <div class="stat-card">
+                    <div class="icon">👷</div>
+                    <h3 class="counter" data-target="500">0</h3>
+                    <p>Registered Workers</p>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">😊</div>
+                    <h3 class="counter" data-target="1000">0</h3>
+                    <p>Happy Customers</p>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">✅</div>
+                    <h3 class="counter" data-target="2000">0</h3>
+                    <p>Jobs Completed</p>
+                </div>
+                <div class="stat-card">
+                    <div class="icon">⭐</div>
+                    <h3><span class="counter-float" data-target="4.8">0.0</span>★</h3>
+                    <p>Average Rating</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Our Mission & Vision -->
+        <section class="animate fade-in" style="margin-top: 8rem;">
+            <h2 class="text-center">Driving the Future of Work</h2>
+            <div class="mission-grid">
+                <div class="icon-card">
+                    <div class="icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="21.17" y1="8" x2="12" y2="8"></line><line x1="3.95" y1="6.06" x2="8.54" y2="14"></line><line x1="10.88" y1="21.94" x2="15.46" y2="14"></line></svg>
+                    </div>
+                    <h3>Our Mission</h3>
+                    <p class="text-secondary">To provide a reliable, transparent, and user-friendly platform for daily wage workers, bypassing high commission agencies and empowering direct connections that respect the value of labor.</p>
+                </div>
+                <div class="icon-card">
+                    <div class="icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </div>
+                    <h3>Our Vision</h3>
+                    <p class="text-secondary">To become the global standard platform where independent skilled labor meets fair opportunity, reshaping local economies, ensuring digital inclusion, and bringing dignity to daily wage work.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Workforce -->
+        <section class="animate slide-in-left" style="margin-top: 8rem;">
+            <h2 class="text-center" style="margin-bottom: 0.5rem;">Our Diverse Workforce</h2>
+            <p class="text-center text-secondary" style="font-size: 1.1rem; max-width: 700px; margin: 0 auto 2rem auto;">
+                Whether you need a <strong>single worker</strong> for a quick fix, a <strong>duo</strong> to speed things up, or a full <strong>group squad</strong> for large projects, we have easily accessible professionals ready to deploy.
+            </p>
+            <div class="workforce-grid">
+                <div class="worker-pic-card animate fade-in">
+                    <img src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=500&auto=format&fit=crop" alt="Construction & Labour">
+                    <div class="label">Construction & Labour</div>
+                </div>
+                <div class="worker-pic-card animate fade-in">
+                    <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=500&auto=format&fit=crop" alt="Cleaning & Maids">
+                    <div class="label">Cleaning & Maids</div>
+                </div>
+                <div class="worker-pic-card animate fade-in">
+                    <img src="https://images.unsplash.com/photo-1621905252507-b35492cc74b4?q=80&w=500&auto=format&fit=crop" alt="Plumbing Experts">
+                    <div class="label">Plumbing Experts</div>
+                </div>
+                <div class="worker-pic-card animate fade-in">
+                    <img src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=500&auto=format&fit=crop" alt="Beauticians & Salon">
+                    <div class="label">Beauticians & Salon</div>
+                </div>
+                <div class="worker-pic-card animate fade-in">
+                    <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=500&auto=format&fit=crop" alt="Electrical Work">
+                    <div class="label">Electrical Work</div>
+                </div>
+                <div class="worker-pic-card animate fade-in">
+                    <img src="https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=500&auto=format&fit=crop" alt="Carpentry">
+                    <div class="label">Carpentry</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. What We Offer -->
+        <section class="animate slide-in-left" style="margin-top: 8rem;">
+            <h2 class="text-center">What We Offer</h2>
+            <div class="offer-grid">
+                <div class="icon-card" style="text-align: center;">
+                    <div class="icon" style="margin: 0 auto 1.5rem auto;">⚡</div>
+                    <h4>Easy Booking</h4>
+                    <p class="text-secondary mt-1">Book a worker in just a few clicks with our intuitive interface.</p>
+                </div>
+                <div class="icon-card" style="text-align: center;">
+                    <div class="icon" style="margin: 0 auto 1.5rem auto;">🛠️</div>
+                    <h4>Multiple Categories</h4>
+                    <p class="text-secondary mt-1">From plumbers to beauticians, we cover diverse local needs.</p>
+                </div>
+                <div class="icon-card" style="text-align: center;">
+                    <div class="icon" style="margin: 0 auto 1.5rem auto;">💸</div>
+                    <h4>Cash & UPI</h4>
+                    <p class="text-secondary mt-1">Flexible, secure payment options handled directly with workers.</p>
+                </div>
+                <div class="icon-card" style="text-align: center;">
+                    <div class="icon" style="margin: 0 auto 1.5rem auto;">🌟</div>
+                    <h4>Rating System</h4>
+                    <p class="text-secondary mt-1">Trusted reviews from real customers to ensure quality service.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Why Choose Us -->
+        <section class="animate slide-in-right" style="margin-top: 8rem;">
+            <h2 class="text-center">Why Choose Us</h2>
+            <div class="offer-grid">
+                <div class="icon-card text-center" style="padding: 2.5rem 1.5rem;">
+                    <div class="icon" style="margin: 0 auto 1rem auto; background: transparent; font-size:2.5rem;">🔒</div>
+                    <h4 style="color: var(--primary-color);">Trusted Workers</h4>
+                    <p class="text-secondary mt-1">Rigorous profile checks & active community reviews.</p>
+                </div>
+                <div class="icon-card text-center" style="padding: 2.5rem 1.5rem;">
+                    <div class="icon" style="margin: 0 auto 1rem auto; background: transparent; font-size:2.5rem;">⏱️</div>
+                    <h4 style="color: var(--primary-color);">Fast Booking</h4>
+                    <p class="text-secondary mt-1">Instant matches based on your geo-location and needs.</p>
+                </div>
+                <div class="icon-card text-center" style="padding: 2.5rem 1.5rem;">
+                    <div class="icon" style="margin: 0 auto 1rem auto; background: transparent; font-size:2.5rem;">🛡️</div>
+                    <h4 style="color: var(--primary-color);">Secure Payments</h4>
+                    <p class="text-secondary mt-1">Zero hidden platform commission fees on worker bids.</p>
+                </div>
+                <div class="icon-card text-center" style="padding: 2.5rem 1.5rem;">
+                    <div class="icon" style="margin: 0 auto 1rem auto; background: transparent; font-size:2.5rem;">📱</div>
+                    <h4 style="color: var(--primary-color);">User Friendly</h4>
+                    <p class="text-secondary mt-1">Designed simply so anyone, anywhere can navigate it easily.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Call To Action -->
+        <section class="cta-bottom animate fade-in">
+            <!-- decorative blurred shapes in background -->
+            <div style="position:absolute; top:-100px; left:-50px; width:300px; height:300px; background: white; opacity:0.1; border-radius:50%; filter: blur(50px);"></div>
+            <div style="position:absolute; bottom:-100px; right:-50px; width:300px; height:300px; background: var(--secondary-color); opacity:0.3; border-radius:50%; filter: blur(50px);"></div>
+            
+            <div style="position: relative; z-index: 2;">
+                <h2 style="margin-bottom: 1rem;">Ready to Get Started?</h2>
+                <p>Join our platform today and experience seamless service booking. Elevate the way you hire daily wage workers.</p>
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <a href="workers.html" class="btn btn-primary cta-btn-primary">Hire a Worker</a>
+                    <a href="register.html" class="btn btn-outline cta-btn-outline">Join as Worker</a>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About Us</a>
+                <a href="contact.html">Contact</a>
+                <a href="workers.html">Browse Workers</a>
+                <a href="login.html">Login</a>
+                <a href="register.html">Register</a>
+            </div>
+            <p class="text-secondary">&copy; 2024 Daily Connect. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Intersection Observer for scroll animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        
+                        // Trigger counters if this is the stats section
+                        if(entry.target.querySelector('.counter')) {
+                            runCounters();
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.animate').forEach((el) => {
+                observer.observe(el);
+            });
+
+            // Counter Animation
+            let countersRun = false;
+            function runCounters() {
+                if(countersRun) return;
+                countersRun = true;
+
+                const counters = document.querySelectorAll('.counter');
+                const speed = 100; // The lower the slower
+
+                counters.forEach(counter => {
+                    const updateCount = () => {
+                        const target = +counter.getAttribute('data-target');
+                        const count = +counter.innerText;
+                        const inc = target / speed;
+
+                        if (count < target) {
+                            counter.innerText = Math.ceil(count + inc);
+                            setTimeout(updateCount, 15);
+                        } else {
+                            counter.innerText = target + "+";
+                        }
+                    };
+                    updateCount();
+                });
+
+                // Float counter (for rating)
+                const floatCounter = document.querySelector('.counter-float');
+                if(floatCounter) {
+                    const target = parseFloat(floatCounter.getAttribute('data-target'));
+                    let count = 0;
+                    const updateFloat = () => {
+                        if (count < target) {
+                            count += 0.1;
+                            floatCounter.innerText = count.toFixed(1);
+                            setTimeout(updateFloat, 30);
+                        } else {
+                            floatCounter.innerText = target.toFixed(1);
+                        }
+                    };
+                    updateFloat();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

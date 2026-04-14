@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Workers - Daily Connect</title>
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Daily Connect
+        </a>
+        <div class="nav-links">
+            <a href="user-dashboard.html" id="dashLink">Dashboard</a>
+            <a href="#" id="logoutBtn" class="btn btn-outline hidden">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container page-layout">
+        <aside class="sidebar-filters">
+            <div class="filter-header">
+                <h3>Filters</h3>
+                <button id="clearFiltersBtn" class="btn-text">Clear All</button>
+            </div>
+            
+            <div class="filter-group">
+                <h4>Search</h4>
+                <input type="text" id="searchInput" class="form-control" placeholder="Search skills, names...">
+            </div>
+
+            <div class="filter-group">
+                <h4>Category</h4>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" class="category-filter" value="plumber"> Plumber</label>
+                    <label><input type="checkbox" class="category-filter" value="cleaner"> Cleaner</label>
+                    <label><input type="checkbox" class="category-filter" value="labour"> Labour</label>
+                    <label><input type="checkbox" class="category-filter" value="beautician"> Beautician</label>
+                    <label><input type="checkbox" class="category-filter" value="electrician"> Electrician</label>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h4>Max Pricing ($/day)</h4>
+                <input type="range" id="priceRange" min="10" max="200" value="200" class="slider">
+                <div class="slider-val">Up to $<span id="priceValue">200</span></div>
+            </div>
+
+            <div class="filter-group">
+                <h4>Rating & Quality</h4>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" id="topRatedFilter" value="top"> ⭐ Top Rated (4.5+)</label>
+                    <label><input type="checkbox" id="recommendedFilter" value="recommended"> 👍 Recommended (4.0+)</label>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h4>Availability</h4>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="availabilityFilter">
+                    <span class="toggle-slider"></span>
+                    <span class="toggle-label">Show only Available</span>
+                </label>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header">
+                <h2>Available Workers</h2>
+                <span id="resultsCount" class="results-count">Loading...</span>
+            </div>
+
+            <div id="alertBox" class="alert"></div>
+
+            <div class="grid-cards" id="workersContainer">
+                <!-- Worker list will be populated here by JS -->
+                <div class="loader"></div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="workers.html">Browse Workers</a>
+                <a href="user-dashboard.html">Dashboard</a>
+            </div>
+            <p class="text-secondary">&copy; 2024 Daily Connect. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/user.js"></script>
+</body>
+</html>

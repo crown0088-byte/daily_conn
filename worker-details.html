@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Profile - Daily Connect</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Daily Connect
+        </a>
+        <div class="nav-links">
+            <a href="workers.html">Back to Search</a>
+            <a href="user-dashboard.html" id="dashLink">Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div id="workerProfileContainer" class="card" style="max-width: 900px; margin: 0 auto; padding: 3rem;">
+            <!-- Content will be injected via JS -->
+            <div class="text-center">
+                <h2>Loading Profile...</h2>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About Us</a>
+                <a href="contact.html">Contact</a>
+                <a href="workers.html">Browse Workers</a>
+            </div>
+            <p class="text-secondary">&copy; 2024 Daily Connect. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/user.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const API_URL = window.API_URL;
+            const params = new URLSearchParams(window.location.search);
+            const wId = params.get('id');
+            const container = document.getElementById('workerProfileContainer');
+            
+            if(!wId) {
+                container.innerHTML = '<h2 class="text-center">Worker not found.</h2>';
+                return;
+            }
+
+            try {
+                // Fetch all workers and find the one. Ideally we should have a get_worker.php endpoint.
+                const response = await fetch(`${API_URL}/user/get_workers.php`);
+                const data = await response.json();
+                
+                if(data.status === 'success') {
+                    const worker = data.data.find(w => w.worker_id == wId);
+                    if(worker) {
+                        const avgRating = parseFloat(worker.avg_rating || 0).toFixed(1);
+                        const reviewCount = parseInt(worker.review_count || 0);
+                        
+                        let badgesHTML = '';
+                        if(avgRating >= 4.5 && reviewCount >= 3) {
+                            badgesHTML += `<span class="badge" style="background:#FFD700; color:#000; margin-left:10px;">⭐ Top Rated</span>`;
+                        } else if(avgRating >= 4.0) {
+                            badgesHTML += `<span class="badge" style="background:#2196F3; color:#fff; margin-left:10px;">👍 Recommended</span>`;
+                        }
+
+                        container.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--border-color); padding-bottom: 2rem; margin-bottom: 2rem;">
+                                <div>
+                                    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; display:flex; align-items:center;">
+                                        ${worker.name} ${badgesHTML}
+                                    </h1>
+                                    <div style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                                        📍 ${worker.location || 'Location Not Specified'}
+                                    </div>
+                                    <div style="font-size: 1.4rem; color: #f39c12; font-weight: bold;">
+                                        ${avgRating} ★ <span style="font-size: 1rem; color: var(--text-secondary); font-weight: normal;">(${reviewCount} reviews)</span>
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);">$${worker.pricing}<span style="font-size: 1rem; color: var(--text-secondary);">/day</span></div>
+                                    <div style="margin-top: 10px;">
+                                        <span class="badge badge-${worker.availability === 'available' ? 'completed' : (worker.availability === 'busy' ? 'pending' : 'rejected')}">${worker.availability ? worker.availability.toUpperCase() : 'OFFLINE'}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 2.5rem;">
+                                <h3 style="margin-bottom: 1rem; color: var(--primary-dark);">About & Skills</h3>
+                                <p style="font-size: 1.1rem; line-height: 1.7;">
+                                    Hello! I am a professional based in ${worker.location || 'your area'}. My core skills include: <br>
+                                    <strong>${worker.skills || 'General Labor'}</strong>
+                                </p>
+                            </div>
+
+                            <div class="text-center" style="margin-top: 3rem;">
+                                ${worker.availability === 'available' ? 
+                                    `<a href="job-request.html?worker=${worker.worker_id}&name=${encodeURIComponent(worker.name)}&rate=${worker.pricing}" class="btn btn-primary" style="font-size: 1.2rem; padding: 1rem 3rem;">Book this Worker</a>` 
+                                    : `<button class="btn btn-outline" style="font-size: 1.2rem; padding: 1rem 3rem;" disabled>Currently Unavailable</button>`
+                                }
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = '<h2 class="text-center">Worker profile could not be found.</h2>';
+                    }
+                }
+            } catch (err) {
+                container.innerHTML = '<h2 class="text-center text-error">Failed to load profile details.</h2>';
+            }
+        });
+    </script>
+</body>
+</html>

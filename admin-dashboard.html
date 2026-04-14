@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Daily Connect</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .admin-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="navbar-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Daily Connect Admin
+        </a>
+        <div class="nav-links">
+            <a href="admin-dashboard.html">Dashboard</a>
+            <a href="workers.html">Browse Workers</a>
+            <a href="#" id="logoutBtn" class="btn btn-outline">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <div>
+                <h2 id="welcomeMsg">Admin Panel</h2>
+                <p class="text-secondary">Platform Management and Statistics</p>
+            </div>
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <section class="mb-2">
+            <h3>Platform Overview</h3>
+            <div class="admin-stats-grid" id="statsContainer">
+                <div class="loader"></div>
+            </div>
+        </section>
+
+        <section class="mt-2">
+            <h3>User Management</h3>
+            <div class="card" style="padding: 0; overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                    <thead style="background: #f1f5f9;">
+                        <tr>
+                            <th style="padding: 1rem; text-align: left; border-bottom: 2px solid var(--border-color);">ID</th>
+                            <th style="padding: 1rem; text-align: left; border-bottom: 2px solid var(--border-color);">Name</th>
+                            <th style="padding: 1rem; text-align: left; border-bottom: 2px solid var(--border-color);">Email</th>
+                            <th style="padding: 1rem; text-align: left; border-bottom: 2px solid var(--border-color);">Role</th>
+                            <th style="padding: 1rem; text-align: left; border-bottom: 2px solid var(--border-color);">Joined</th>
+                            <th style="padding: 1rem; text-align: left; border-bottom: 2px solid var(--border-color);">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr><td colspan="5" style="padding: 2rem; text-align: center;"><div class="loader"></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p class="text-secondary text-center">&copy; 2024 Daily Connect. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const API_URL = window.API_URL;
+            const user = getUser();
+            if(!user || user.role !== 'admin') {
+                // For testing/demo purposes, we'll allow viewing but normally redirect:
+                // window.location.href = 'login.html';
+            }
+            
+            loadUsers();
+            loadStats();
+        });
+
+        async function loadStats() {
+            const statsContainer = document.getElementById('statsContainer');
+            try {
+                const response = await fetch(`${API_URL}/admin/stats.php`);
+                const data = await response.json();
+                
+                if(data.status === 'success') {
+                    const stats = data.data;
+                    statsContainer.innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-label">Total Users</div>
+                            <div class="stat-value">${stats.total_users || 0}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Total Workers</div>
+                            <div class="stat-value">${stats.workers || 0}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Total Jobs</div>
+                            <div class="stat-value">${stats.total_jobs || 0}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Completed Jobs</div>
+                            <div class="stat-value">${stats.jobs_completed || 0}</div>
+                        </div>
+                    `;
+                } else {
+                    statsContainer.innerHTML = `<p>${data.message}</p>`;
+                }
+            } catch (err) {
+                statsContainer.innerHTML = '<p>Error loading statistics.</p>';
+            }
+        }
+
+        async function loadUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            try {
+                const response = await fetch(`${API_URL}/admin/get_users.php`);
+                const data = await response.json();
+                
+                if(data.status === 'success') {
+                    tbody.innerHTML = '';
+                    data.data.forEach(u => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);">${u.id}</td>
+                            <td style="padding: 1rem; border-bottom: 1px solid var(--border-color); font-weight: 600;">${u.name}</td>
+                            <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);">${u.email}</td>
+                            <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);">
+                                <span class="badge" style="background: ${u.role === 'admin' ? '#ef4444' : (u.role === 'worker' ? '#10b981' : '#4f46e5')}; color: white;">${u.role.toUpperCase()}</span>
+                            </td>
+                            <td style="padding: 1rem; border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">${new Date(u.created_at).toLocaleDateString()}</td>
+                            <td style="padding: 1rem; border-bottom: 1px solid var(--border-color);">
+                                <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; border-color: var(--error); color: var(--error);" onclick="deleteUser(${u.id})">Delete</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="6" style="padding: 2rem; text-align: center;">${data.message}</td></tr>`;
+                }
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="6" style="padding: 2rem; text-align: center;">Error loading users.</td></tr>';
+            }
+        }
+
+        async function deleteUser(id) {
+            if(!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+            
+            try {
+                const response = await fetch(`${API_URL}/admin/delete_user.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: id })
+                });
+                const data = await response.json();
+                
+                if(data.status === 'success') {
+                    showAlert('alertBox', data.message, 'success');
+                    loadUsers();
+                    loadStats(); // update counts
+                } else {
+                    showAlert('alertBox', data.message, 'error');
+                }
+            } catch (err) {
+                showAlert('alertBox', 'Failed to delete user.', 'error');
+            }
+        }
+    </script>
+</body>
+</html>

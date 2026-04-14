@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User Profile - Daily Connect</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .profile-badges { margin-top: 10px; display: flex; gap: 10px; }
+        .badge-top-rated { background-color: #FFD700; color: #000; font-weight: bold; border-radius: 5px; padding: 5px 10px; font-size: 0.9em; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .badge-recommended { background-color: #2196F3; color: #fff; font-weight: bold; border-radius: 5px; padding: 5px 10px; font-size: 0.9em; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .star-rating { color: #f39c12; font-size: 1.2em; display: inline-block; margin-right: 5px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="user-dashboard.html" class="navbar-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Daily Connect
+        </a>
+        <div class="nav-links">
+            <a href="user-dashboard.html">Dashboard</a>
+            <a href="workers.html">Browse Workers</a>
+            <a href="#" id="logoutBtn" class="btn btn-outline">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container auth-wrapper">
+        <div class="auth-card" style="max-width: 600px;">
+            <h2>Edit Personal Profile</h2>
+            <div id="profileAlert" class="alert"></div>
+            
+            <form id="userProfileForm">
+                <div class="form-group">
+                    <label for="userName">Full Name</label>
+                    <input type="text" id="userName" class="form-control" required placeholder="e.g. John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">Email Address</label>
+                    <input type="email" id="userEmail" class="form-control" required placeholder="e.g. john@example.com">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Profile</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="workers.html">Browse Workers</a>
+                <a href="login.html">Login</a>
+                <a href="register.html">Register</a>
+            </div>
+            <p class="text-secondary">&copy; 2024 Daily Connect. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/user.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = getUser();
+            if(user) {
+                document.getElementById('userName').value = user.name || '';
+                document.getElementById('userEmail').value = user.email || '';
+            }
+
+            const profileForm = document.getElementById('userProfileForm');
+            if(profileForm && user) {
+                profileForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const name = document.getElementById('userName').value;
+                    const email = document.getElementById('userEmail').value;
+
+                    try {
+                        const response = await fetch(`${API_URL}/user/update_profile.php`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                                user_id: user.id, 
+                                name: name,
+                                email: email
+                            })
+                        });
+                        const data = await response.json();
+                        
+                        if(data.status === 'success') {
+                            showAlert('profileAlert', data.message, 'success');
+                            // Update local storage user data
+                            user.name = data.data.name;
+                            user.email = data.data.email;
+                            localStorage.setItem('daily_connect_user', JSON.stringify(user));
+                            setTimeout(() => window.location.href = 'user-dashboard.html', 1500);
+                        } else {
+                            showAlert('profileAlert', data.message, 'error');
+                        }
+                    } catch (err) {
+                        showAlert('profileAlert', 'Failed to update profile.', 'error');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
