@@ -109,11 +109,6 @@ daily_connect/
 
 ---
 
-## 📸 Screenshots
-
-| Landing Page | Worker Discovery | User Dashboard |
-| :---: | :---: | :---: |
-| ![Landing Page Placeholder](https://via.placeholder.com/800x450?text=DailyConnect+Landing+Page) | ![Workers List Placeholder](https://via.placeholder.com/800x450?text=Worker+Discovery+Interface) | ![Dashboard Placeholder](https://via.placeholder.com/800x450?text=User+Management+Dashboard) |
 
 ---
 
@@ -142,6 +137,6 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ---
 
 ## 📧 Contact
-**Your Name** - [Your LinkedIn](https://linkedin.com/in/yourprofile) - email@example.com
+**Your Name** - www.linkedin.com/in/rudra-c15 - rudrachauhan1575@gmail.com 
 
-Project Link: [https://github.com/yourusername/daily-connect](https://github.com/yourusername/daily-connect)
+
